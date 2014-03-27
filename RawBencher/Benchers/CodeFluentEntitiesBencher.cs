@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace RawBencher.Benchers
@@ -14,6 +17,27 @@ namespace RawBencher.Benchers
         public CodeFluentEntitiesBencher()
             : base(e => e.SalesOrderID, usesChangeTracking: false, usesCaching: false)
         {
+            //Check if stored procedures exist, and create them when needed
+            try
+            {
+                CodeFluentEntities.Bencher.Sales.SalesOrderHeader.Load(0);
+            }
+            catch (SqlException e)
+            {
+                if (e.Number == 2812)
+                {
+                    string sqlConnectionString = CodeFluent.Runtime.CodeFluentContext.Get(CodeFluentEntities.Bencher.Constants.CodeFluentEntities_BencherStoreName).Persistence.ConnectionString;
+                    var command = File.ReadAllText(@".\..\..\..\CodeFluentEntities.Bencher\Persistence\CodeFluentEntities.Bencher_procedures.sql");
+                    var commands = command.Split(new string[]{@"GO"}, StringSplitOptions.RemoveEmptyEntries);
+                    using (var conn = new SqlConnection(sqlConnectionString))
+                    {
+                        conn.Open();
+                        foreach(var c in commands)
+                            new SqlCommand(c, conn).ExecuteNonQuery();
+                    }
+
+                }
+            }
         }
 
         /// <summary>

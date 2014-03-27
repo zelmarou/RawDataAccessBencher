@@ -12,7 +12,7 @@ In the same folder you can notice the performance of CodeFluent Entities in the 
 
 CONFIGURATION
 -------------
-Please before the first run you must play the SQL file "CodeFluentEntities.Bencher\Persistence\CodeFluentEntities.Bencher_procedures.sql" to build the stored procedures on the target database
+You should run this file "CodeFluentEntities.Bencher\Persistence\CodeFluentEntities.Bencher_procedures_all.sql" to build the all stored procedures on the target database
 
 
  Using CodeFluent Entities generator(optional)
